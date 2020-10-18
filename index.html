@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" type="text/css" href="vendors/bootstrap.min.css">
     <script type="text/javascript" src="vendors/purify.min.js"></script>
+    <script type="text/javascript" src="DOMPurify-main/dist/purify.js"></script>
 </head>
 
 <body style="background-image: url(img/united-squares.png); color: #ffffff;">
@@ -24,7 +25,7 @@
 
             <p class="text-center" id="welcome-text"></p>
             <p class="text-center small">
-                (Change the 'name' parameter in the URL to replace "applicant" by your identity. Ex :
+               !!! (Change the 'name' parameter in the URL to replace "applicant" by your identity. Ex :
                 www.blop.com/index.html?name=Simone)</p>
 
             <h5 style="margin-top: 2%; margin-bottom: 2%;">
@@ -81,7 +82,7 @@
     </div>
 
     <script>
-
+        //var clean = DOMPurify.sanitize(dirty);
         // General URL settings (boring stuff)
 
         const url = document.location.search;
@@ -96,17 +97,18 @@
             userName = userParam;
         }
 
-        document.getElementById("welcome-text").innerHTML = "<h1>How do you do, " + userName + "?</h1>";
+        document.getElementById("welcome-text").innerHTML =  DOMPurify.sanitize("<h1>How do you do, " + userName + "?</h1>");
 
         //  XSS vulnerability #2
 
         const input = document.getElementById("fav-meal-question");
         const log = document.getElementById("fav-meal-answer");
-
+        
         input.addEventListener("input", updateValue);
 
         function updateValue(e) {
-            log.innerHTML = e.target.value;
+            //log.innerHTML = e.target.value.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;');
+            log.innerHTML = DOMPurify.sanitize(e.target.value);
         }
 
         //  XSS vulnerability #3
@@ -118,14 +120,14 @@
         showButton.addEventListener("click", showHTML);
 
         function showHTML() {
-            htmlOutput.innerHTML = htmlInput.value;
+            htmlOutput.innerHTML = DOMPurify.sanitize(htmlInput.value);
         }
 
         //  XSS vulnerability #4
 
         const redir = params.get("goto");
         if (redir !== null && redir !== "null") {
-            document.location = redir;
+            DOMPurify.sanitize(document.location) = redir;
         }
 
     </script>
